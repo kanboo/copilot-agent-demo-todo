@@ -4,7 +4,7 @@
 class TodoApp {
     constructor() {
         this.todos = [];
-        this.currentFilter = 'all';
+        this.currentFilter = this.loadFilter(); // 讀取過濾器狀態
         this.init();
     }
 
@@ -85,13 +85,29 @@ class TodoApp {
 
     setFilter(filter) {
         this.currentFilter = filter;
-
+        this.saveFilter(); // 儲存過濾器狀態
         // 更新按鈕狀態
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filter);
         });
-
         this.render();
+    }
+
+    saveFilter() {
+        try {
+            localStorage.setItem('todoFilter', this.currentFilter);
+        } catch (e) {
+            console.error('儲存過濾器狀態失敗:', e);
+        }
+    }
+
+    loadFilter() {
+        try {
+            return localStorage.getItem('todoFilter') || 'all';
+        } catch (e) {
+            console.error('讀取過濾器狀態失敗:', e);
+            return 'all';
+        }
     }
 
     getFilteredTodos() {

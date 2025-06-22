@@ -5,12 +5,12 @@
 ## 1. 獲取 Issue 資訊
 執行指令查看所有 issues：
 ```bash
-gh issue list
+gh issue list | cat
 ```
 
 選擇一個 issue 並查看詳情：
 ```bash
-gh issue view <number>
+gh issue view <number> | cat
 ```
 
 ## 2. 開始開發
