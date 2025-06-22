@@ -11,10 +11,10 @@ class TodoApp {
     init() {
         // 從 LocalStorage 載入資料
         this.loadTodos();
-        
+
         // 綁定事件
         this.bindEvents();
-        
+
         // 初始渲染
         this.render();
     }
@@ -30,12 +30,27 @@ class TodoApp {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
         });
+
+        // 清除已完成任務
+        const clearBtn = document.getElementById('clearCompleted');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.handleClearCompleted());
+        }
+    }
+
+    handleClearCompleted() {
+        if (!this.todos.some(t => t.completed)) return;
+        if (window.confirm('確定要清除所有已完成的任務嗎？此操作無法復原。')) {
+            this.todos = this.todos.filter(t => !t.completed);
+            this.saveTodos();
+            this.render();
+        }
     }
 
     addTodo() {
         const input = document.getElementById('todoInput');
         const text = input.value.trim();
-        
+
         if (!text) return;
 
         const todo = {
@@ -48,7 +63,7 @@ class TodoApp {
         this.todos.push(todo);
         this.saveTodos();
         this.render();
-        
+
         input.value = '';
     }
 
@@ -70,12 +85,12 @@ class TodoApp {
 
     setFilter(filter) {
         this.currentFilter = filter;
-        
+
         // 更新按鈕狀態
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filter);
         });
-        
+
         this.render();
     }
 
@@ -103,22 +118,22 @@ class TodoApp {
     render() {
         const todoList = document.getElementById('todoList');
         const filteredTodos = this.getFilteredTodos();
-        
+
         if (filteredTodos.length === 0) {
             todoList.innerHTML = '<li class="empty-state">沒有任務</li>';
         } else {
             todoList.innerHTML = filteredTodos.map(todo => `
                 <li class="todo-item ${todo.completed ? 'completed' : ''}">
-                    <input type="checkbox" 
-                           class="todo-checkbox" 
-                           ${todo.completed ? 'checked' : ''} 
+                    <input type="checkbox"
+                           class="todo-checkbox"
+                           ${todo.completed ? 'checked' : ''}
                            onchange="todoApp.toggleTodo(${todo.id})">
                     <span class="todo-text">${this.escapeHtml(todo.text)}</span>
                     <button class="delete-btn" onclick="todoApp.deleteTodo(${todo.id})">刪除</button>
                 </li>
             `).join('');
         }
-        
+
         this.updateStats();
     }
 
