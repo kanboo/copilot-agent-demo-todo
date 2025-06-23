@@ -30,6 +30,22 @@ class TodoApp {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
         });
+
+        // 綁定清除已完成按鈕
+        const clearBtn = document.getElementById('clearCompleted');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.handleClearCompleted());
+        }
+    }
+
+    handleClearCompleted() {
+        const completedCount = this.todos.filter(t => t.completed).length;
+        if (completedCount === 0) return;
+        if (window.confirm(`確定要清除 ${completedCount} 筆已完成任務嗎？此操作無法復原。`)) {
+            this.todos = this.todos.filter(t => !t.completed);
+            this.saveTodos();
+            this.render();
+        }
     }
 
     addTodo() {
@@ -120,6 +136,18 @@ class TodoApp {
         }
         
         this.updateStats();
+
+        // 動態插入清除已完成按鈕
+        let clearBtn = document.getElementById('clearCompleted');
+        if (!clearBtn) {
+            clearBtn = document.createElement('button');
+            clearBtn.id = 'clearCompleted';
+            clearBtn.className = 'btn btn-danger';
+            clearBtn.textContent = '清除已完成';
+            todoList.parentNode.insertBefore(clearBtn, todoList.nextSibling);
+            clearBtn.addEventListener('click', () => this.handleClearCompleted());
+        }
+        clearBtn.style.display = this.todos.some(t => t.completed) ? 'block' : 'none';
     }
 
     saveTodos() {
